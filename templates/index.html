@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Population Visualization</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <div id="chart"></div>
+    <script>
+        var data = JSON.parse('{{ data.to_json(orient="records")|tojson }}');
+        var years = Object.keys(data[0]).slice(2);  // Extract the years from the data
+        
+        // Create an empty array for the frames
+        var frames = [];
+        
+        // Iterate over each data point
+        for (var i = 0; i < data.length; i++) {
+            var row = data[i];
+            
+            // Extract the population values for each year
+            var population = years.map(function(year) {
+                return row[year];
+            });
+            
+            // Create a frame for each data point
+            var frame = {
+                name: row['Country'],
+                data: [{
+                    x: years,
+                    y: population,
+                    type: 'bar'
+                }]
+            };
+            
+            // Add the frame to the frames array
+            frames.push(frame);
+        }
+        
+        // Create the Bar Chart Race using Plotly
+        Plotly.newPlot('chart', frames, {
+            title: 'Population Bar Chart Race',
+            xaxis: { title: 'Year' },
+            yaxis: { title: 'Population' },
+            updatemenus: [{
+                type: 'buttons',
+                buttons: [{
+                    label: 'Play',
+                    method: 'animate',
+                    args: [null, {
+                        frame: { duration: 500, redraw: false },
+                        fromcurrent: true,
+                        transition: { duration: 300, easing: 'quadratic-in-out' }
+                    }]
+                }]
+            }]
+        });
+    </script>
+</body>
+</html>
